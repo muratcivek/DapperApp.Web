@@ -1,0 +1,21 @@
+﻿using Microsoft.Data.SqlClient;
+using System.Data;
+
+namespace DapperApp.Web.Context
+{
+    public class AppDbContext
+    {
+        private readonly string _connectionString;
+
+        public AppDbContext(IConfiguration configuration)
+        {
+            _connectionString = configuration
+                .GetConnectionString("SqlConnection")
+                ?? throw new InvalidOperationException(
+                    "SqlConnection bağlantı bilgisi bulunamadı.");
+        }
+
+        public IDbConnection CreateConnection() => new SqlConnection(_connectionString);
+        
+    }
+}
