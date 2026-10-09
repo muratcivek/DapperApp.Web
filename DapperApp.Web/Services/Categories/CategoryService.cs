@@ -13,62 +13,78 @@ namespace DapperApp.Web.Services.Categories
             _context = context;
         }
 
-        public Task CreateAsync(CreateCategoryDto categoryDto)
+        public async Task CreateAsync(CreateCategoryDto categoryDto)
         {
-           string query = "insert into categories (name) values (@Name)";
+            const string query = @"
+                INSERT INTO Categories (Name)
+                VALUES (@Name)";
 
-            var parameters = new DynamicParameters();
-            parameters.Add("name", categoryDto.Name);
+            using var connection = _context.CreateConnection();
 
-            var connection = _context.CreateConnection();
-
-            return connection.ExecuteAsync(query, parameters);
+            await connection.ExecuteAsync(
+                query,
+                new { Name = categoryDto.Name }
+            );
         }
 
-        public Task DeleteAsync(int id)
+        public async Task DeleteAsync(int id)
         {
-            string query = "delete from categories where categoryid = @Id";
+            const string query = @"
+                DELETE FROM Categories
+                WHERE CategoryId = @Id";
 
-            var parameters = new DynamicParameters();
-            parameters.Add("id", id);
+            using var connection = _context.CreateConnection();
 
-            var connection = _context.CreateConnection();
-
-            return connection.ExecuteAsync(query, parameters);
+            await connection.ExecuteAsync(
+                query,
+                new { Id = id }
+            );
         }
 
         public async Task<IEnumerable<ResultCategoryDto>> GetAllAsync()
         {
-            string query = "select * from categories";
+            const string query = @"
+                SELECT CategoryId, Name
+                FROM Categories
+                ORDER BY CategoryId DESC";
 
-            var connection = _context.CreateConnection();
+            using var connection = _context.CreateConnection();
 
             return await connection.QueryAsync<ResultCategoryDto>(query);
         }
 
-        public async Task<ResultCategoryDto> GetByIdAsync(int id)
+        public async Task<ResultCategoryDto?> GetByIdAsync(int id)
         {
-            string query = "select * from categories where categoryid = @Id";
+            const string query = @"
+                SELECT CategoryId, Name
+                FROM Categories
+                WHERE CategoryId = @Id";
 
-            var parameters = new DynamicParameters();
-            parameters.Add("id", id);
+            using var connection = _context.CreateConnection();
 
-            var connection = _context.CreateConnection();
-
-            return await connection.QueryFirstOrDefaultAsync<ResultCategoryDto>(query, parameters);
+            return await connection.QueryFirstOrDefaultAsync<ResultCategoryDto>(
+                query,
+                new { Id = id }
+            );
         }
 
-        public Task UpdateAsync(UpdateCategoryDto categoryDto)
+        public async Task UpdateAsync(UpdateCategoryDto categoryDto)
         {
-            string query = "update categories set name = @Name where categoryid = @Id";
+            const string query = @"
+                UPDATE Categories
+                SET Name = @Name
+                WHERE CategoryId = @Id";
 
-            var parameters = new DynamicParameters();
-            parameters.Add("name", categoryDto.Name);
-            parameters.Add("id", categoryDto.CategoryId);
+            using var connection = _context.CreateConnection();
 
-            var connection = _context.CreateConnection();
-
-            return connection.ExecuteAsync(query, parameters);
+            await connection.ExecuteAsync(
+                query,
+                new
+                {
+                    Id = categoryDto.CategoryId,
+                    Name = categoryDto.Name
+                }
+            );
         }
     }
 }

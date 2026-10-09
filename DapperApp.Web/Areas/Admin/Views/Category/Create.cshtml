@@ -1,0 +1,61 @@
+﻿@model DapperApp.Web.DTOs.Categories.CreateCategoryDto
+
+@{
+    ViewData["Title"] = "Yeni Kategori Ekle";
+    Layout = "_Layout";
+}
+
+<div class="container mt-4">
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Yeni Kategori Ekle</h5>
+        </div>
+
+        <div class="card-body">
+
+            <form asp-action="Create" method="post">
+
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label">
+                        Kategori Adı
+                    </label>
+
+                    <input asp-for="Name"
+                           class="form-control"
+                           placeholder="Kategori adını giriniz"
+                           maxlength="50" />
+
+                    <span asp-validation-for="Name"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+
+                    <a asp-action="Index"
+                       class="btn btn-secondary">
+                        İptal
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-success">
+                        Kaydet
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
