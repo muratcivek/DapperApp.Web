@@ -1,0 +1,187 @@
+﻿@model IEnumerable<DapperApp.Web.DTOs.Products.ResultProductDto>
+
+@{
+    ViewData["Title"] = "Ürün Listesi";
+    Layout = "_Layout";
+
+    var products = Model?.ToList()
+        ?? new List<DapperApp.Web.DTOs.Products.ResultProductDto>();
+}
+
+<div class="container mt-4">
+
+    <!-- Başlık ve Yeni Ürün -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>Ürün Listesi</h3>
+
+        <a asp-area="Admin"
+           asp-controller="Product"
+           asp-action="Create"
+           class="btn btn-success">
+            + Yeni Ürün
+        </a>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show"
+             role="alert">
+            @TempData["Success"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Kapat">
+            </button>
+        </div>
+    }
+
+    <!-- Toplam Ürün Sayısı -->
+    <div class="alert alert-info">
+        Toplam Ürün Sayısı:
+        <strong>@products.Count</strong>
+    </div>
+
+    <!-- Ürün Tablosu -->
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped table-hover align-middle">
+
+            <thead class="table-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Görsel</th>
+                    <th>Ürün ID</th>
+                    <th>Ürün Adı</th>
+                    <th>Kategori</th>
+                    <th>Fiyat</th>
+                    <th>Stok</th>
+                    <th>Durum</th>
+                    <th style="width: 200px;">İşlemler</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (products.Any())
+                {
+                    int rowNumber = 1;
+
+                    foreach (var item in products)
+                    {
+                        <tr>
+                            <td>@rowNumber</td>
+
+                            <!-- Ürün Görseli -->
+                            <td>
+                                <img src="@(string.IsNullOrWhiteSpace(item.ImageUrl)
+                                                                    ? "https://placehold.co/60x60?text=Urun"
+                                                                    : item.ImageUrl)"
+                                     alt="@item.Name"
+                                     width="60"
+                                     height="60"
+                                     class="rounded border"
+                                     style="object-fit:cover;"
+                                     loading="lazy"
+                                     onerror="this.onerror=null;this.src='https://placehold.co/60x60?text=Urun';" />
+                            </td>
+
+                            <!-- Ürün ID -->
+                            <td>@item.ProductId</td>
+
+                            <!-- Ürün Adı -->
+                            <td>@item.Name</td>
+
+                            <!-- Kategori -->
+                            <td>
+                                @(item.Category?.Name ?? "Kategori Yok")
+                            </td>
+
+                            <!-- Fiyat -->
+                            <td>
+                                @item.Price.ToString("N2",
+                                    new System.Globalization.CultureInfo("tr-TR")) ₺
+                            </td>
+
+                            <!-- Stok -->
+                            <td>
+                                @if (item.Stock == 0)
+                                {
+                                    <span class="badge bg-danger">
+                                        Stok Yok
+                                    </span>
+                                }
+                                else if (item.Stock <= 10)
+                                {
+                                    <span class="badge bg-warning text-dark">
+                                        @item.Stock Adet
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success">
+                                        @item.Stock Adet
+                                    </span>
+                                }
+                            </td>
+
+                            <!-- Durum -->
+                            <td>
+                                @if (item.IsActive)
+                                {
+                                    <span class="badge bg-success">
+                                        Aktif
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">
+                                        Pasif
+                                    </span>
+                                }
+                            </td>
+
+                            <!-- İşlemler -->
+                            <td>
+                                <a asp-area="Admin"
+                                   asp-controller="Product"
+                                   asp-action="Update"
+                                   asp-route-id="@item.ProductId"
+                                   class="btn btn-warning btn-sm">
+                                    Güncelle
+                                </a>
+
+                                <form asp-area="Admin"
+                                      asp-controller="Product"
+                                      asp-action="Delete"
+                                      asp-route-id="@item.ProductId"
+                                      method="post"
+                                      class="d-inline"
+                                      onsubmit="return confirm('Bu ürünü silmek istediğinize emin misiniz?');">
+
+                                    @Html.AntiForgeryToken()
+
+                                    <button type="submit"
+                                            class="btn btn-danger btn-sm">
+                                        Sil
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+
+                        rowNumber++;
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="9"
+                            class="text-center text-muted py-4">
+                            Kayıtlı ürün bulunamadı.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+
+        </table>
+    </div>
+
+</div>

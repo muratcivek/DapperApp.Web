@@ -1,13 +1,13 @@
 using DapperApp.Web.Context;
+using DapperApp.Web.Extensions;
 using DapperApp.Web.Services.Categories;
+using DapperApp.Web.Services.Products;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddScoped<AppDbContext>();
-
-builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.RegisterServices();
 
 builder.Services.AddControllersWithViews();
 

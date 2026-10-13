@@ -34,20 +34,35 @@ namespace DapperApp.Web.Services.Products
             await _db.ExecuteAsync(query, parameters);
         }
 
+
         public async Task<IEnumerable<ResultProductDto>> GetAllAsync()
         {
-            string query = @"
-                SELECT p.ProductId, p.Name, p.Price, p.Stock, p.ImageUrl, p.IsActive, p.CategoryId,
-                       c.CategoryId, c.Name AS CategoryName
-                FROM Products p
-                INNER JOIN Categories c ON p.CategoryId = c.CategoryId";
+            const string query = @"
+        SELECT
+            p.ProductId,
+            p.Name,
+            p.Price,
+            p.Stock,
+            p.ImageUrl,
+            p.IsActive,
+            p.CategoryId,
+            c.CategoryId AS CategorySplitId,
+            c.Name
+        FROM Products p
+        INNER JOIN Categories c
+            ON p.CategoryId = c.CategoryId";
 
-            return await _db.QueryAsync<ResultProductDto, ResultCategoryDto, ResultProductDto>(query, (product, category) =>
-            {
-                product.Category = category;
-                return product;
-            },
-            splitOn: "CategoryId");
+            return await _db.QueryAsync
+                <ResultProductDto, ResultCategoryDto, ResultProductDto>(
+                    query,
+                    (product, category) =>
+                    {
+                        category.CategoryId = product.CategoryId;
+                        product.Category = category;
+                        return product;
+                    },
+                    splitOn: "CategorySplitId"
+                );
         }
 
         public async Task<UpdateProductDto> GetByIdAsync(int id)
